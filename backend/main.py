@@ -3,13 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 
-from news_core import (
+from .news_core import (
     fetch_latest_issues,
-    generate_article,
+    generate_medium_article,
     generate_social_package,
-    save_article,
-    save_social_package,
 )
+
 
 app = FastAPI(title="AI News Backend")
 
