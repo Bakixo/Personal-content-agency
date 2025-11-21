@@ -1,0 +1,10 @@
+OpenAI yine yaptı yapacağını, GPT-5.1 resmen duyuruldu!
+Hem de bu sefer iki farklı modelle geliyorlar.
+İlki, geliştiriciler için GPT-5.1 Codex.
+Bu, uygulamaların arkasındaki yeni süper beyin olacak ve API üzerinden çalışacak.
+İkincisi ise hepimizin kullanacağı GPT-5.1 Pro.
+Bu da bildiğimiz ChatGPT'nin yeni ve daha akıllı versiyonu.
+Peki bu ne anlama geliyor?
+Daha hızlı, daha mantıklı ve kod yazmada daha iyi bir yapay zeka demek.
+OpenAI, bu hamleyle rakiplerine 'lider benim' mesajını net bir şekilde veriyor.
+Benim yorumum: Bu bir ara güncelleme gibi görünse de aslında çok stratejik bir hamle. OpenAI, hem geliştiricileri hem de son kullanıcıları aynı anda memnun ederek pazar hakimiyetini korumaya çalışıyor. Bu rekabet en çok bize yarayacak!

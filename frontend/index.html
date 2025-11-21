@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Haber → İçerik Üretim Paneli</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          sans-serif;
+        background: radial-gradient(circle at top left, #020617, #020617 40%, #000 100%);
+        color: #e5e7eb;
+      }
+
+      .glass {
+        background: rgba(15, 23, 42, 0.92);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.8);
+      }
+
+      .pill {
+        border-radius: 999px;
+      }
+
+      .card {
+        border-radius: 1.25rem;
+        border: 1px solid rgba(31, 41, 55, 0.8);
+        background: radial-gradient(circle at top left, #0b1120, #020617 55%);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: #f9fafb;
+      }
+
+      .btn-secondary {
+        background: #020617;
+        color: #e5e7eb;
+        border: 1px solid rgba(156, 163, 175, 0.7);
+      }
+
+      textarea {
+        background-color: #020617;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        resize: vertical;
+      }
+
+      .scrollbar-thin::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: rgba(148, 163, 184, 0.6);
+        border-radius: 999px;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      <!-- HEADER -->
+      <header class="mb-6 glass px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-11 h-11 rounded-full bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-500 flex items-center justify-center"
+          >
+            <span class="text-xl">🧠</span>
+          </div>
+          <div>
+            <h1 class="text-2xl font-extrabold tracking-wide">
+              AI Haber → <span class="text-indigo-400">İçerik Üretim Paneli</span>
+            </h1>
+            <p class="text-xs text-slate-400">
+              news.smol.ai • Gemini API • Baki'nin kişisel içerik ajansı 🚀
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 text-xs text-slate-400">
+          <span class="hidden sm:inline-block">Made by Baki</span>
+          <div
+            class="pill border border-slate-600 px-3 py-1 flex items-center gap-1 text-[11px]"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Backend: FastAPI
+          </div>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[1.1fr,1.6fr] gap-6">
+        <!-- LEFT: Haberler -->
+        <section class="glass p-4 flex flex-col gap-4">
+          <!-- Üst kontrol -->
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-red-500"></div>
+              <h2 class="text-sm font-semibold text-slate-100">Haberler</h2>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <span>Kaç haber?</span>
+              <select
+                id="limitSelect"
+                class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-2 py-1"
+              >
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+              </select>
+              <button
+                id="refreshBtn"
+                class="btn-secondary pill px-3 py-1.5 text-xs font-semibold"
+              >
+                🔄 Yenile
+              </button>
+            </div>
+          </div>
+
+          <!-- Haber listesi -->
+          <div
+            id="issuesList"
+            class="space-y-3 max-h-[360px] overflow-y-auto pr-1 scrollbar-thin"
+          >
+            <!-- JS ile doldurulacak -->
+          </div>
+
+          <!-- Seçilen haber detay -->
+          <div class="border-t border-slate-700 pt-3 mt-2 text-xs">
+            <div class="font-semibold text-slate-300 mb-1">
+              Seçilen haber:
+              <span id="selectedTitle" class="text-indigo-300"></span>
+            </div>
+            <a
+              id="selectedLink"
+              href="#"
+              class="text-[11px] text-cyan-400 hover:underline"
+              target="_blank"
+              rel="noreferrer"
+              >Kaynağı aç</a
+            >
+            <p id="selectedSummary" class="mt-2 text-[11px] text-slate-400"></p>
+          </div>
+        </section>
+
+        <!-- RIGHT: İçerik üretimi -->
+        <section class="flex flex-col gap-4">
+          <!-- Butonlar -->
+          <div class="glass p-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-slate-100">İçerik Üretimi</span>
+              <span class="text-[11px] text-slate-400"
+                >Seçili haber üzerinden içerik üret.</span
+              >
+            </div>
+            <div class="flex gap-3">
+              <button
+                id="mediumBtn"
+                class="btn-primary pill px-4 py-2 text-xs font-semibold shadow-lg shadow-indigo-500/40"
+              >
+                ✍️ Medium Yazısı Üret
+              </button>
+              <button
+                id="socialBtn"
+                class="btn-secondary pill px-4 py-2 text-xs font-semibold"
+              >
+                📱 Sosyal Paket Üret
+              </button>
+            </div>
+          </div>
+
+          <!-- Output alanları -->
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <!-- Medium -->
+            <div class="card p-4 flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-slate-100"
+                  >📄 Medium Taslağı</span
+                >
+                <button
+                  id="copyMediumBtn"
+                  class="text-[11px] text-slate-400 hover:text-slate-200"
+                >
+                  Kopyala
+                </button>
+              </div>
+              <textarea
+                id="mediumOutput"
+                rows="18"
+                class="w-full text-xs p-2"
+                placeholder="Henüz Medium yazısı üretilmedi."
+              ></textarea>
+            </div>
+
+            <!-- Sosyal -->
+            <div class="card p-4 flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-slate-100"
+                  >📱 Sosyal Medya Paketi</span
+                >
+                <button
+                  id="copySocialBtn"
+                  class="text-[11px] text-slate-400 hover:text-slate-200"
+                >
+                  Hepsini Kopyala
+                </button>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-[11px] text-slate-400">🎥 Video Script</label>
+                <textarea
+                  id="videoOutput"
+                  rows="6"
+                  class="w-full text-xs p-2"
+                  placeholder="Henüz script üretilmedi."
+                ></textarea>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-[11px] text-slate-400">📊 Carousel (5 slide)</label>
+                <textarea
+                  id="carouselOutput"
+                  rows="6"
+                  class="w-full text-xs p-2"
+                  placeholder="Henüz carousel üretilmedi."
+                ></textarea>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-[11px] text-slate-400">💬 Benim Yorumum</label>
+                <textarea
+                  id="commentOutput"
+                  rows="4"
+                  class="w-full text-xs p-2"
+                  placeholder="Henüz yorum üretilmedi."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:8000"; // FastAPI backend
+
+      let issues = [];
+      let selectedIndex = 0;
+
+      const issuesListEl = document.getElementById("issuesList");
+      const selectedTitleEl = document.getElementById("selectedTitle");
+      const selectedLinkEl = document.getElementById("selectedLink");
+      const selectedSummaryEl = document.getElementById("selectedSummary");
+
+      const limitSelect = document.getElementById("limitSelect");
+      const refreshBtn = document.getElementById("refreshBtn");
+      const mediumBtn = document.getElementById("mediumBtn");
+      const socialBtn = document.getElementById("socialBtn");
+
+      const mediumOutput = document.getElementById("mediumOutput");
+      const videoOutput = document.getElementById("videoOutput");
+      const carouselOutput = document.getElementById("carouselOutput");
+      const commentOutput = document.getElementById("commentOutput");
+
+      const copyMediumBtn = document.getElementById("copyMediumBtn");
+      const copySocialBtn = document.getElementById("copySocialBtn");
+
+      function renderIssues() {
+        issuesListEl.innerHTML = "";
+        issues.forEach((issue, idx) => {
+          const div = document.createElement("div");
+          div.className =
+            "p-3 rounded-xl border transition cursor-pointer " +
+            (idx === selectedIndex
+              ? "border-indigo-500 bg-slate-900/60"
+              : "border-slate-700 bg-slate-900/30 hover:bg-slate-900/60");
+
+          div.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="text-[11px] text-slate-400">${issue.date}</div>
+                <div class="text-sm font-semibold text-slate-100 line-clamp-2">
+                  ${issue.title}
+                </div>
+              </div>
+              <button class="text-[11px] text-indigo-300 hover:underline">Seç</button>
+            </div>
+          `;
+
+          div.onclick = () => {
+            selectedIndex = idx;
+            updateSelectedDetails();
+            renderIssues();
+          };
+
+          issuesListEl.appendChild(div);
+        });
+
+        updateSelectedDetails();
+      }
+
+      function updateSelectedDetails() {
+        if (!issues.length) return;
+        const issue = issues[selectedIndex];
+        selectedTitleEl.textContent = issue.title;
+        selectedLinkEl.href = issue.url;
+        selectedSummaryEl.textContent = issue.summary || "";
+      }
+
+      async function fetchIssues() {
+        const limit = limitSelect.value;
+        issuesListEl.innerHTML = '<div class="text-xs text-slate-400">Yükleniyor...</div>';
+
+        try {
+          const res = await fetch(`${API_BASE}/api/issues?limit=${limit}`);
+          issues = await res.json();
+          selectedIndex = 0;
+          renderIssues();
+        } catch (err) {
+          console.error(err);
+          issuesListEl.innerHTML =
+            '<div class="text-xs text-red-400">Haberler alınırken hata oluştu.</div>';
+        }
+      }
+
+      async function generateMedium() {
+        if (!issues.length) return;
+        const issue = issues[selectedIndex];
+        mediumOutput.value = "Medium yazısı üretiliyor...";
+
+        try {
+          const res = await fetch(`${API_BASE}/api/generate/medium`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ issue }),
+          });
+          const data = await res.json();
+          mediumOutput.value = data.markdown || "Boş çıktı döndü.";
+        } catch (err) {
+          console.error(err);
+          mediumOutput.value = "Hata: Medium yazısı üretilemedi.";
+        }
+      }
+
+      async function generateSocial() {
+        if (!issues.length) return;
+        const issue = issues[selectedIndex];
+        videoOutput.value = "Üretiliyor...";
+        carouselOutput.value = "";
+        commentOutput.value = "";
+
+        try {
+          const res = await fetch(`${API_BASE}/api/generate/social`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ issue }),
+          });
+          const data = await res.json();
+          const s = data.social;
+          videoOutput.value = s.video_script || "";
+          carouselOutput.value = (s.carousel_slides || []).join("\n\n---\n\n");
+          commentOutput.value = s.personal_comment || "";
+        } catch (err) {
+          console.error(err);
+          videoOutput.value = "Hata: Sosyal paket üretilemedi.";
+        }
+      }
+
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).catch((err) => console.error(err));
+      }
+
+      // Event listeners
+      refreshBtn.addEventListener("click", fetchIssues);
+      mediumBtn.addEventListener("click", generateMedium);
+      socialBtn.addEventListener("click", generateSocial);
+
+      copyMediumBtn.addEventListener("click", () => {
+        copyToClipboard(mediumOutput.value);
+      });
+
+      copySocialBtn.addEventListener("click", () => {
+        const txt =
+          "🎥 Video Script\n\n" +
+          videoOutput.value +
+          "\n\n📊 Carousel\n\n" +
+          carouselOutput.value +
+          "\n\n💬 Yorum\n\n" +
+          commentOutput.value;
+        copyToClipboard(txt);
+      });
+
+      // İlk açılışta haberleri çek
+      fetchIssues();
+    </script>
+  </body>
+</html>

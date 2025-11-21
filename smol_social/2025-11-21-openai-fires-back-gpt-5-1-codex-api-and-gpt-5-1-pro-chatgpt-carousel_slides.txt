@@ -1,0 +1,33 @@
+--- Slide 1 ---
+OpenAI Sahaya Geri Döndü: GPT-5.1 Geliyor!
+
+Codex (API) ve Pro (ChatGPT) olmak üzere iki yeni model duyuruldu.
+
+--- Slide 2 ---
+Haber Özeti
+
+• OpenAI, GPT-5'in ara sürümü olan GPT-5.1'i tanıttı.
+• İki farklı versiyon mevcut: Geliştiriciler için "Codex" ve son kullanıcılar için "Pro".
+• Bu hamle, rakip firmaların son duyurularına bir cevap niteliği taşıyor.
+
+--- Slide 3 ---
+Teknik Yenilikler
+
+• GPT-5.1 Codex: API üzerinden erişilecek ve özellikle kod üretimi ile mantık yürütme konusunda iyileştirilmiş olacak.
+• GPT-5.1 Pro: ChatGPT'ye entegre edilecek, daha hızlı ve tutarlı cevaplar sunacak.
+• Genel olarak, modellerin verimliliği ve işlem hızı artırıldı.
+
+--- Slide 4 ---
+Bu Ne İşe Yarar?
+
+• Geliştiriciler: Daha güçlü ve yetenekli uygulamalar geliştirebilecekler.
+• Kullanıcılar: Günlük sohbetlerde ve görevlerde ChatGPT'den daha iyi sonuçlar alacaklar.
+• Sektör: Yapay zeka rekabeti hızlanacak, bu da daha hızlı gelişimi tetikleyecek.
+
+--- Slide 5 ---
+Benim Yorumum
+
+• OpenAI, 'en iyi biziz' mesajını net bir şekilde veriyor.
+• Ara güncellemeler, büyük sıçramalar kadar önemli. Bu, pazar liderliğini koruma stratejisi.
+• Geliştirici (Codex) ve kullanıcı (Pro) ayrımı, ürün odaklanmasını gösteren akıllıca bir hamle.
+

@@ -1,0 +1,33 @@
+--- Slide 1 ---
+Yapay Zeka Görsel Üretiminde Devrim: Nano Banana Pro!
+
+Google'ın yeni modeli metin, infografik ve doğruluk sorunlarını kökünden çözüyor.
+
+--- Slide 2 ---
+Haber Özeti:
+
+• Google, Gemini Image Pro (kod adı: Nano Banana Pro) adlı yeni bir görsel üretim modelini duyurdu.
+• Model, görsellerdeki metin kalitesini, infografik üretimini ve bilgi doğruluğunu hedefliyor.
+• Midjourney ve DALL-E gibi rakiplerine karşı ciddi bir meydan okuma niteliğinde.
+
+--- Slide 3 ---
+Teknik Yenilikler:
+
+• Metin Entegrasyonu: Görsellere hatasız ve estetik metinler ekleyebilme.
+• İnfografik Üretimi: Veriye dayalı grafikler, tablolar ve diyagramlar oluşturma.
+• Google Search Grounding: Görselleri güncel ve doğrulanmış bilgilerle besleme.
+
+--- Slide 4 ---
+Bu Ne İşe Yarar?
+
+• Reklam ve Pazarlama: Saniyeler içinde sloganlı, okunaklı posterler ve reklam görselleri hazırlama.
+• Eğitim ve Sunum: Karmaşık verileri anlaşılır infografiklere dönüştürme.
+• Sosyal Medya: Hızlıca dikkat çekici, bilgi dolu ve yüksek çözünürlüklü içerikler üretme.
+
+--- Slide 5 ---
+Benim Yorumum:
+
+• Bu gelişme, 'prompt engineering'in yanına 'veri odaklı tasarım' kavramını da ekleyecek.
+• Özellikle pazarlamacılar ve içerik üreticileri için tasarım süreçleri inanılmaz hızlanacak.
+• Google'ın arama motoru gücünü kullanması, onu diğerlerinden ayıracak en kritik özellik olabilir.
+
