@@ -88,7 +88,7 @@ def fetch_latest_issues(limit=3):
 # ---------------------------------------------------------
 # 2) Gemini ile Medium yazısı üret
 # ---------------------------------------------------------
-def generate_article(item):
+def generate_article(issue):
     system_instruction = """
 Sen bir üniversite istatistik ve veri bilimi topluluğu için Medium makaleleri yazan
 profesyonel bir teknik editörsün.
@@ -111,27 +111,39 @@ Biçem:
 
 
     user_prompt = f"""
-Aşağıdaki AI haberini al ve Türkçe, detaylı bir Medium makalesine dönüştür:
+    You are an AI assistant that writes **perfect Medium-formatted articles**.
 
-Tam başlık: {item['raw_title']}
-Ayrıştırılmış başlık: {item['title']}
-Tarih (tahmini): {item['date']}
-Kaynak: {item['url']}
-Kısa özet: {item['summary']}
+    ### STRICT RULES — DO NOT BREAK:
+    1. Do NOT add any introduction like “Harika bir konu…” or personal comments.
+    2. Start directly with the article title in markdown: `# Başlık`.
+    3. Use proper markdown for headings: `##`, `###`.
+    4. Use bullet points (`-`), numbered lists (`1.`), bold (`**...**`) and italic (`*...*`).
+    5. When writing code:
+       - ALWAYS use fenced code blocks.
+       - ALWAYS specify language like:
+         ```python
+         print("hello")
+         ```
+       - NEVER escape backticks.
+       - NEVER add stray hashtags (#) unless they are headings.
+    6. No extra explanations, no meta-comments, no reasoning steps.
+    7. Output ONLY the article — clean, readable, Medium-friendly markdown.
 
-Makale:
-- Haber neden önemli? Aç
-- Teknik kısmı öğrencilerin anlayacağı şekilde sadeleştir
-- Firmanın, modelin, olayın bağlamını ver
-- Öğrenciler için ne ifade ettiği üzerine dur
-- Kod örneği gerekiyorsa basit bir örnek ekle
-- Sonunda "Özet" ve "Sonraki Adımlar" başlıkları mutlaka olsun
+    ### ARTICLE REQUIREMENTS:
+    - Write like a tech Medium writer.
+    - Clear structure with readable sections.
+    - Add short, informative code examples **only if appropriate**.
+    - Do not add AI disclaimers.
+    - Do not add “as an AI model”.
+    - Language must match the user’s language: Turkish article → Turkish output.
 
-Çıktıyı tamamen Markdown formatında ver.
+    ### START NOW:
+    Bu haber üzerine Medium-ready bir makale yaz:
+    {issue}
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-pro",
+        model="gemini-2.5-flash-lite",
         contents=user_prompt,
         config=types.GenerateContentConfig(
             system_instruction=system_instruction,
