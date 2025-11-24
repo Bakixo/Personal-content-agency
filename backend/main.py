@@ -1,28 +1,47 @@
+import os
+from typing import List, Optional, Dict
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
 
 from .news_core import (
     fetch_latest_issues,
-    generate_medium_article,
-    generate_social_package,
+    generate_article,          # <-- makale üretimi
+    generate_social_package,   # <-- sosyal paket üretimi
+    save_article,              # <-- md kaydetme
+    save_social_package,       # <-- sosyal paket dosyalarını kaydetme
 )
 
+app = FastAPI(title="Personal Content Agency")
 
-app = FastAPI(title="AI News Backend")
-
-# CORS (frontend localhost'tan çağırırken sorun olmasın diye)
+# (Opsiyonel) Frontend farklı origin’deyse aç:
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # istersen sadece http://localhost:5173 vs yazarsın
+    allow_origins=["*"],           # istersen domain ile daralt
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ---------- Static / Frontend ----------
+# /static altında css/js/asset’leri servisle
+app.mount("/static", StaticFiles(directory="frontend", html=True), name="static")
 
-# --------- Pydantic modelleri ---------
+# Root isteğinde index.html ver
+@app.get("/", include_in_schema=False)
+async def serve_frontend():
+    index_path = os.path.join("frontend", "index.html")
+    return FileResponse(index_path)
+
+# Basit sağlık kontrolü
+@app.get("/health", include_in_schema=False)
+async def health():
+    return {"status": "ok"}
+
+# ---------- Pydantic Modeller ----------
 class Issue(BaseModel):
     raw_title: str
     title: str
@@ -30,73 +49,42 @@ class Issue(BaseModel):
     url: str
     summary: Optional[str] = None
 
-
 class SocialPackage(BaseModel):
     video_script: str
     carousel_slides: List[str]
     personal_comment: str
 
-
 class GenerateRequest(BaseModel):
     issue: Issue
-
 
 class MediumResponse(BaseModel):
     markdown: str
     saved_path: Optional[str] = None
 
-
 class SocialResponse(BaseModel):
     social: SocialPackage
     saved_paths: Optional[Dict[str, str]] = None
 
-
-# --------- API endpoint'leri ---------
-
-
+# ---------- API ----------
 @app.get("/api/issues", response_model=List[Issue])
-def get_issues(limit: int = 3):
-    """
-    news.smol.ai'den son haberleri çek.
-    Frontend buradan listeyi alacak.
-    """
-    issues = fetch_latest_issues(limit=limit)
-    return issues
-
+def api_get_issues(limit: int = 3):
+    return fetch_latest_issues(limit=limit)
 
 @app.post("/api/generate/medium", response_model=MediumResponse)
-def generate_medium_article(req: GenerateRequest, save: bool = False):
-    """
-    Verilen haberden Medium formatında markdown makale üret.
-    İsteğe bağlı olarak md dosyasını da kaydedebilir.
-    """
+def api_generate_medium(req: GenerateRequest, save: bool = False):
     issue_dict = req.issue.dict()
     markdown = generate_article(issue_dict)
 
-    saved_path = None
-    if save:
-        saved_path = save_article(issue_dict, markdown)
-
+    saved_path = save_article(issue_dict, markdown) if save else None
     return MediumResponse(markdown=markdown, saved_path=saved_path)
 
-
 @app.post("/api/generate/social", response_model=SocialResponse)
-def generate_social(req: GenerateRequest, save: bool = False):
-    """
-    Verilen haberden sosyal medya paketi üret
-    (video script + carousel + yorum).
-    """
+def api_generate_social(req: GenerateRequest, save: bool = False):
     issue_dict = req.issue.dict()
     social = generate_social_package(issue_dict)
     if social is None:
-        # Çok basit bir hata cevabı, frontend'te kontrol edersin
+        # Frontend’e düzgün hata dönmek istersen HTTPException fırlatabilirsin
         raise RuntimeError("Sosyal paket üretilemedi (JSON sorunu olabilir).")
 
-    saved_paths = None
-    if save:
-        saved_paths = save_social_package(issue_dict, social)
-
-    return SocialResponse(
-        social=SocialPackage(**social),
-        saved_paths=saved_paths,
-    )
+    saved_paths = save_social_package(issue_dict, social) if save else None
+    return SocialResponse(social=SocialPackage(**social), saved_paths=saved_paths)
