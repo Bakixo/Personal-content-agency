@@ -93,18 +93,22 @@ def generate_article(item):
 Sen bir üniversite istatistik ve veri bilimi topluluğu için Medium makaleleri yazan
 profesyonel bir teknik editörsün.
 
-Görevlerin:
-- Sana verilen haberlerden, doğrudan yayımlanmaya hazır makale metni üret.
-- Asla "işte hazırladığım makale", "harika bir görev" gibi meta cümleler yazma.
-- Kendinden bahsetme, sadece yazının içeriğini yaz.
-- Okuyucuya "topluluğumuzun sayfasına hoş geldiniz" gibi cümlelerle hitap edebilirsin.
+KESİN KURALLAR:
+- Asla giriş/preamble/meta cümleleri yazma (örn: "Harika bir konu!", "Hoş geldiniz", "Bu yazıda..." yok).
+- Kendinden ve görevinden bahsetme. Sadece makale içeriğini yaz.
+- Başlığı yaz, sonra direkt içeriğe geç. Gereksiz selam/giriş yok.
+- Kod veriyorsan her zaman üçlü fence ile ver: 
 
-Tarz:
-- Açıklayıcı, sade, samimi
-- Gerektiğinde madde işaretleri ve başlıklar (##, ###)
-- En az 800 kelime
-- Sonunda mutlaka "## Özet" ve "## Sonraki Adımlar" bölümleri olsun.
+- Kodun içinde yorum kullanacaksan Python yorumlarını (#) normal şekilde bırak; ama kod kesinlikle fenced blok içinde olsun.
+- Yalnızca gerekli yerlerde başlık kullan (## düzeyinde). Başlık satırlarını gereksiz çoğaltma.
+
+Biçem:
+- Açıklayıcı, sade.
+- Madde imleri ve kısa alt başlıklar kullan.
+- En az 800 kelime.
+- Sonda mutlaka "## Özet" ve "## Sonraki Adımlar" olsun.
 """
+
 
     user_prompt = f"""
 Aşağıdaki AI haberini al ve Türkçe, detaylı bir Medium makalesine dönüştür:
@@ -136,7 +140,9 @@ Makale:
         ),
     )
 
-    return response.text
+    raw = response.text
+    return sanitize_for_medium(raw)
+
 
 def generate_medium_article(item):
     """
@@ -354,3 +360,25 @@ def main():
             print("    [!] Sosyal paket üretilemedi (JSON sorunu olabilir).")
 
 
+import re
+
+def sanitize_for_medium(md: str) -> str:
+    # 1) Baştaki olası meta/preamble cümlelerini süpür
+    kill_starts = [
+        r"^harika bir konu", r"^merhaba", r"^topluluğumuz", r"^bu yazıda",
+        r"^işte .* makale", r"^heyecan verici", r"^selam"
+    ]
+    lines = md.splitlines()
+    while lines and any(re.search(p, lines[0].strip().lower()) for p in kill_starts):
+        lines.pop(0)
+    md = "\n".join(lines)
+
+    # 2) Kod çitlerini sağlamlaştır: ``` ile başlayan/bitmeyen kaçakları kapat (basit güvenlik)
+    # (Eğer açılmış ama kapanmamış bir blok varsa sona ``` ekle)
+    if md.count("```") % 2 == 1:
+        md += "\n```"
+
+    # 3) Arka arkaya 3+ boş satırı 2’ye indir
+    md = re.sub(r"\n{3,}", "\n\n", md)
+
+    return md.strip()
